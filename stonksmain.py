@@ -15,7 +15,7 @@ dispatcher = updater.dispatcher
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
 def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a stonks bot. Please talk to me!")
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
@@ -29,17 +29,21 @@ def caps(update, context):
 caps_handler = CommandHandler('caps', caps)
 dispatcher.add_handler(caps_handler)
 
-def stock(update, context):
-    stock_class = StockInfo(context.args)
+def get_back_stock(argss):
+    stock_class = StockInfo(argss)
     closing_price, latest = stock_class.latest_price()
-    ret_text = "The closing price for " + str(context.args[0]) + " on " + latest + " is " + str(closing_price) 
+    return "The closing price for " + str(argss) + " on " + latest + " is " + str(closing_price) 
+
+
+def stock(update, context):
+    ret_text = get_back_stock(context.args[0])
     context.bot.send_message(chat_id=update.effective_chat.id, text=ret_text)
 
 stock_handler = CommandHandler('stock', stock)
 dispatcher.add_handler(stock_handler)
 
 
-def inline_caps(update, context):
+def inline_stock(update, context):
     query = update.inline_query.query
     if not query:
         return
@@ -47,14 +51,14 @@ def inline_caps(update, context):
     results.append(
         InlineQueryResultArticle(
             id=query.upper(),
-            title='Caps',
-            input_message_content=InputTextMessageContent(query.upper())
+            title='Latest closing stock price',
+            input_message_content=InputTextMessageContent(get_back_stock(query.upper()))
         )
     )
     context.bot.answer_inline_query(update.inline_query.id, results)
 
-inline_caps_handler = InlineQueryHandler(inline_caps)
-dispatcher.add_handler(inline_caps_handler)
+inline_stock_handler = InlineQueryHandler(inline_stock)
+dispatcher.add_handler(inline_stock_handler)
 
 
 def unknown(update, context):
