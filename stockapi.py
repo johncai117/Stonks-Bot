@@ -2,7 +2,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 
-def area_plot(prices, dates, name, userid):
+def area_plot(prices, dates, name, chatid ):
     import matplotlib.pyplot as plt
     plt.switch_backend('Agg') 
     fig = plt.figure()
@@ -21,7 +21,7 @@ def area_plot(prices, dates, name, userid):
     max_date = pd.to_datetime(dates[-1]).strftime('%d %b %Y') 
     plt.title("$"+ name + " Closing Price from " + min_date + " to " + max_date)
 
-    plt.savefig(str(userid) + "_" + name + '.png')
+    plt.savefig(str(chatid) + "_" + name + '.png')
 
     return str(userid) + "_" + name + '.png'
     
@@ -29,7 +29,7 @@ def area_plot(prices, dates, name, userid):
     
 
 class StockInfo():
-    def __init__(self,ticker, chat_id):
+    def __init__(self,ticker, chat_id = "000"):
         if isinstance(ticker, str):
             self.tick = yf.Ticker(ticker)
         else:
