@@ -6,6 +6,7 @@ from telegram.ext import MessageHandler, Filters
 from telegram import InlineQueryResultArticle, InputTextMessageContent
 from configs import token ### this must be set in the config file. not comitted to github for privacy issues.
 from stockapi import StockInfo
+import os
 ### generate updater using token
 
 updater = Updater(token=token, use_context=True)
@@ -29,18 +30,27 @@ def caps(update, context):
 caps_handler = CommandHandler('caps', caps)
 dispatcher.add_handler(caps_handler)
 
-def get_back_stock(argss):
-    stock_class = StockInfo(argss)
+def get_back_stock(*argss):
+    stock_class = StockInfo(*argss)
     closing_price, latest = stock_class.latest_price()
-    return "The closing price for " + str(argss) + " on " + latest + " is " + str(closing_price) 
+    return "The closing price for " + str(argss[0]) + " on " + latest + " is " + str(closing_price) 
 
 
 def stock(update, context):
-    ret_text = get_back_stock(context.args[0])
+    ret_text = get_back_stock(context.args[0], update.effective_chat.id)
     context.bot.send_message(chat_id=update.effective_chat.id, text=ret_text)
 
 stock_handler = CommandHandler('stock', stock)
 dispatcher.add_handler(stock_handler)
+
+def monthlyret(update, context):
+    stock_class = StockInfo(context.args[0], update.effective_chat.id)
+    image_file = stock_class.days_past(24)
+    context.bot.send_photo(chat_id=update.effective_chat.id, photo=open(image_file, 'rb'))
+    os.remove(image_file) ##remove file after sending
+
+monthlyret_handler = CommandHandler('monthlyret', monthlyret)
+dispatcher.add_handler(monthlyret_handler)
 
 
 def inline_stock(update, context):
