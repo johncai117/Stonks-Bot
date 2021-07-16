@@ -65,6 +65,21 @@ class StockInfo():
         latest_dates = self.hist.index.values
         return area_plot(close, latest_dates, str(self.tick.ticker), self.chat_id)
 
+def inline_stock(update, context): ## inline query
+        query = update.inline_query.query
+        if not query:
+            return
+        results = list()
+        results.append(
+            InlineQueryResultArticle(
+                id=query.upper(),
+                title='Latest closing stock price',
+                input_message_content=InputTextMessageContent(get_back_stock(query.upper()))
+            )
+        )
+        context.bot.answer_inline_query(update.inline_query.id, results)
+#inline_stock_handler = InlineQueryHandler(inline_stock)
+    
 
 if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -72,8 +87,6 @@ if __name__ == "__main__":
     updater = Updater(token=TOKEN, use_context=True)
 
     dispatcher = updater.dispatcher
-
-    
 
     def start(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a stonks bot. Please talk to me!")
@@ -102,24 +115,6 @@ if __name__ == "__main__":
 
     monthlyret_handler = CommandHandler('monthlyret', monthlyret)
     dispatcher.add_handler(monthlyret_handler)
-
-
-    def inline_stock(update, context):
-        query = update.inline_query.query
-        if not query:
-            return
-        results = list()
-        results.append(
-            InlineQueryResultArticle(
-                id=query.upper(),
-                title='Latest closing stock price',
-                input_message_content=InputTextMessageContent(get_back_stock(query.upper()))
-            )
-        )
-        context.bot.answer_inline_query(update.inline_query.id, results)
-
-    inline_stock_handler = InlineQueryHandler(inline_stock)
-    dispatcher.add_handler(inline_stock_handler)
 
 
     def unknown(update, context):
