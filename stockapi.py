@@ -23,7 +23,7 @@ def area_plot(prices, dates, name, chatid ):
 
     plt.savefig(str(chatid) + "_" + name + '.png')
 
-    return str(userid) + "_" + name + '.png'
+    return str(chatid) + "_" + name + '.png'
     
 
     

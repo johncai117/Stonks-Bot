@@ -4,12 +4,15 @@ import logging
 from telegram.ext import InlineQueryHandler
 from telegram.ext import MessageHandler, Filters
 from telegram import InlineQueryResultArticle, InputTextMessageContent
-from configs import token ### this must be set in the config file. not comitted to github for privacy issues.
+#from configs import token ### this must be set in the config file. not comitted to github for privacy issues.
 from stockapi import StockInfo
 import os
 ### generate updater using token
+TOKEN = os.getenv("API_KEY", "optional-default") ## get from heroku environment
 
-updater = Updater(token=token, use_context=True)
+PORT = int(os.environ.get('PORT', 5000))
+
+updater = Updater(token=TOKEN, use_context=True)
 
 dispatcher = updater.dispatcher
 
@@ -20,15 +23,6 @@ def start(update, context):
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
-
-updater.start_polling()
-
-def caps(update, context):
-    text_caps = ' '.join(context.args).upper()
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
-
-caps_handler = CommandHandler('caps', caps)
-dispatcher.add_handler(caps_handler)
 
 def get_back_stock(*argss):
     stock_class = StockInfo(*argss)
@@ -76,3 +70,12 @@ def unknown(update, context):
 
 unknown_handler = MessageHandler(Filters.command, unknown)
 dispatcher.add_handler(unknown_handler)
+
+#### START WEBHOOKS below
+
+updater.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=TOKEN)
+updater.bot.setWebhook('https://stonksbot.herokuapp.com/' + TOKEN)
+
+updater.idle()
