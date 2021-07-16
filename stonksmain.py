@@ -9,8 +9,6 @@ import os
 ### generate updater using token
 TOKEN = os.environ.get("API_KEY") ## get from heroku environment
 
-PORT = int(os.environ.get('PORT', 5000))
-
 import yfinance as yf
 import numpy as np
 import pandas as pd
@@ -68,16 +66,15 @@ class StockInfo():
         return area_plot(close, latest_dates, str(self.tick.ticker), self.chat_id)
 
 
-
-
 if __name__ == "__main__":
-
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.INFO)
     updater = Updater(token=TOKEN, use_context=True)
 
     dispatcher = updater.dispatcher
 
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                        level=logging.INFO)
+    
+
     def start(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a stonks bot. Please talk to me!")
 
@@ -131,11 +128,8 @@ if __name__ == "__main__":
     unknown_handler = MessageHandler(Filters.command, unknown)
     dispatcher.add_handler(unknown_handler)
 
-    #### START WEBHOOKS below
+    #### START Polling below
 
-    updater.start_webhook(listen="0.0.0.0",
-                            port=int(PORT),
-                            url_path=TOKEN)
-    updater.bot.setWebhook('https://mega-stonks-bot.herokuapp.com/' + TOKEN)
+    updater.start_polling()
 
     updater.idle()

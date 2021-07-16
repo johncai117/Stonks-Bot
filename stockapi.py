@@ -59,6 +59,6 @@ class StockInfo():
 
 
 if __name__ == "__main__":
-    instance = StockInfo(["AAPL"])
+    instance = StockInfo(["KO"])
     print(instance.latest_price())
     print(instance.days_past(100))
